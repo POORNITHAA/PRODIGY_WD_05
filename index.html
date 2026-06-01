@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphic Weather Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* DIRECT LINK TO YOUR CHOSEN SUNSET OCEAN BACKGROUND */
+            background-image: url('https://images.pexels.com/photos/8738464/pexels-photo-8738464.jpeg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+
+        /* The Glassmorphic Container */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(16px) saturate(180%); 
+            -webkit-backdrop-filter: blur(16px) saturate(180%); 
+            border: 1px solid rgba(255, 255, 255, 0.15); 
+            border-radius: 24px;
+            padding: 35px;
+            width: 100%;
+            max-width: 420px;
+            color: #ffffff;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Search Controls */
+        .search-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            outline: none;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.1); 
+            color: #080808;
+            transition: all 0.3s ease;
+        }
+
+        input::placeholder {
+            color: rgba(7, 7, 7, 0.6);
+        }
+
+        input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 30px;
+            background: #ffffff;
+            color: #2c3e50;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: rgba(11, 11, 11, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .location-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            color: #0d0d0d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .location-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Weather display elements */
+        .weather-display {
+            display: none; 
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .city-name {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 2px;
+        }
+
+        .temp-display {
+            font-size: 4rem;
+            font-weight: 300;
+            margin: 5px 0;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .sky-condition {
+            font-size: 1.1rem;
+            color: rgba(15, 14, 14, 0.85);
+            text-transform: capitalize;
+            margin-bottom: 25px;
+        }
+
+        /* Secondary Grid Data */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .metric-item p {
+            font-size: 0.8rem;
+            color: rgba(10, 10, 10, 0.6);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-item span {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .status-message {
+            color: rgba(16, 16, 16, 0.7);
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <h1>Atmosphere Weather</h1>
+        
+        <div class="search-group">
+            <input type="text" id="city-search" placeholder="Search city...">
+            <button id="search-action">Go</button>
+        </div>
+
+        <button id="geo-action" class="location-btn">Use Local Position</button>
+
+        <div id="status-text" class="status-message">Enter a city to display weather details.</div>
+
+        <div class="weather-display" id="weather-card">
+            <div class="city-name" id="ui-city">Paris, FR</div>
+            <div class="temp-display" id="ui-temp">22°C</div>
+            <div class="sky-condition" id="ui-desc">Partly Cloudy</div>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <p>Humidity</p>
+                    <span id="ui-humidity">54%</span>
+                </div>
+                <div class="metric-item">
+                    <p>Wind</p>
+                    <span id="ui-wind">4.1 m/s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your API Key is loaded here automatically:
+        const CONFIG_KEY = '497d2a288e8ffd5cc913f1b22711d643'; 
+
+        const searchAction = document.getElementById('search-action');
+        const geoAction = document.getElementById('geo-action');
+        const citySearch = document.getElementById('city-search');
+        const weatherCard = document.getElementById('weather-card');
+        const statusText = document.getElementById('status-text');
+
+        searchAction.addEventListener('click', () => {
+            const val = citySearch.value.trim();
+            if(val) fetchPayload(`q=${val}`);
+        });
+
+        citySearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const val = citySearch.value.trim();
+                if(val) fetchPayload(`q=${val}`);
+            }
+        });
+
+        geoAction.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                statusText.textContent = "Locating...";
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        fetchPayload(`lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
+                    },
+                    () => {
+                        statusText.textContent = "Location access denied.";
+                    }
+                );
+            } else {
+                statusText.textContent = "Geolocation unsupported.";
+            }
+        });
+
+        async function fetchPayload(query) {
+            if (CONFIG_KEY === 'YOUR_API_KEY_HERE') {
+                statusText.textContent = "Please add your API Key inside the script tag.";
+                return;
+            }
+
+            try {
+                statusText.style.display = 'block';
+                statusText.textContent = "Updating metrics...";
+                weatherCard.style.display = 'none';
+
+                const apiEndpoint = `https://api.openweathermap.org/data/2.5/weather?${query}&units=metric&appid=${CONFIG_KEY}`;
+                const res = await fetch(apiEndpoint);
+                
+                if (!res.ok) throw new Error();
+                const packet = await res.json();
+                
+                renderUI(packet);
+            } catch (err) {
+                statusText.textContent = "Location not found. Try another city.";
+                weatherCard.style.display = 'none';
+            }
+        }
+
+        function renderUI(packet) {
+            statusText.style.display = 'none';
+            
+            document.getElementById('ui-city').textContent = `${packet.name}, ${packet.sys.country}`;
+            document.getElementById('ui-temp').textContent = `${Math.round(packet.main.temp)}°C`;
+            document.getElementById('ui-desc').textContent = packet.weather[0].description;
+            document.getElementById('ui-humidity').textContent = `${packet.main.humidity}%`;
+            document.getElementById('ui-wind').textContent = `${packet.wind.speed} m/s`;
+
+            weatherCard.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
